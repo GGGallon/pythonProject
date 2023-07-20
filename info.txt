@@ -1,0 +1,2 @@
+{'id': '001', 'name': '张三', 'eGrade': 1, 'pGrade': 20, 'jGrade': 20, 'totalGrade': 41}
+{'id': '002', 'name': '李四', 'eGrade': 30, 'pGrade': 30, 'jGrade': 30, 'totalGrade': 90}
