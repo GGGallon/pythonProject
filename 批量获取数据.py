@@ -59,7 +59,7 @@ def change_file_name(rawpath, namestring):#doc 化为docx
     close_excel_by_force(DispatchEx("Excel.Application"))
 
 fileList = []
-path = 'C:/Users/86410/Desktop/试验数据/试验报告'
+path = 'C:/Users/86410/Desktop/试验报告_20230901095541078'
 # for i in range(1, 8):
 #     print(path+str(i))
 #     for file_name in os.listdir(path+str(i)):
@@ -81,7 +81,7 @@ path = 'C:/Users/86410/Desktop/试验数据/试验报告'
 #     table = document.tables  # 读取word中的表格
 #     document.
 #     print(file_name+":" + table.info())
-des_path = 'C:/Users/86410/Desktop/试验数据/最后数据'
+des_path = 'C:/Users/86410/Desktop/试验数据/最后数据2'
 
 
 # for i in range(1, 8):
@@ -123,6 +123,56 @@ des_path = 'C:/Users/86410/Desktop/试验数据/最后数据'
 #                 data.to_csv(des_path + '/' + file_name.split('.')[0]+'.csv', encoding='gbk', index=False)
 #                 break
 # print('保存完毕')
+
+
+
+###########################################################
+# for file_name in os.listdir(path):#doc改docx
+#     if file_name[-3:] == 'doc':
+#         # print(file_name)
+#         save_doc_to_docx(path, file_name)
+#         os.remove(os.path.join(path, file_name))
+
+############################################################
+for file_name in os.listdir(path):
+    document = Document(path + '/' + file_name)
+    tables = document.tables
+    first_table = tables[0]
+    place = ''
+    time = ''
+    cell_row = 0
+    for row in first_table.rows:
+        cell_column = 0
+        for cell in row.cells:
+            if cell.text == '工作地点':
+                place = row.cells[cell_column+1].text.strip().split(',')[0]
+                print(place)
+            elif cell.text == '工作开始时间':
+                time = row.cells[cell_column+1].text.split('-')[0]
+                print(time)
+            cell_column += 1
+        cell_row += 1
+
+    for table in tables[1:]:
+        item_list = []
+        tan_list = []
+        pf_list = []
+        if table.cell(0, 1).text == 'tanδ(%)' and len(table.cell(1, 1).text)>0:
+            # doc = Document()
+            # doc.add_table(table[count])
+            # doc.save(des_path + '/' + file_name)
+            for row in table.rows[1:-1]:
+                item_list.append(row.cells[0].text)
+                tan_list.append(row.cells[1].text)
+                pf_list.append(row.cells[2].text)
+
+            data = pd.DataFrame({'变电站': place, '所属相别': item_list, 'tg(%)': tan_list, '电容': pf_list, '试验日期': time})
+            # data = data.drop(0, axis=1)
+            data.to_csv(des_path + '/' + file_name.split('.')[0]+'.csv', encoding='gbk', index=False)
+            break
+
+print('csv保存成功')
+######################################################################################
 res_file_list = []
 res_file_list = os.listdir(des_path)
 res_dic = {'变电站': '', '所属相别': '', 'tg(%)': '', '电容变化': '', '试验日期': '', 'tg(%)2': '', '电容变化2': '', '试验日期2': '', 'tg(%)3': '', '电容变化3': '', '试验日期3': ''}
