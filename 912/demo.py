@@ -10,9 +10,12 @@ import tkinter.messagebox as msgbox
 
 def cal():
     res = []
-    for t in my_list:
-        res.append(math.sqrt(2) * ib * math.sin(100 * math.pi * t - math.pi / 2) + math.sqrt(2) * ib * math.exp(
-            -t / (tdc / 1000)))
+    try:
+        for t in my_list:
+            res.append(math.sqrt(2) * ib * math.sin(100 * math.pi * t - math.pi / 2) + math.sqrt(2) * ib * math.exp(
+                -t / (tdc / 1000)))
+    except Exception as e:
+        print(e)
     return res
 
 
@@ -21,22 +24,29 @@ def processing():
     index_1 = -1
     index_2 = -1
     count = int((t_opening + t_protect) / 0.00001)
+    try:
+        if res[count] < res[count+1]: #上升沿
+            for j in range(count, len(res)):
+                count += 1
+                if res[j+1] < res[j]:
+                    break
 
-    for i in range(count, len(res) - 1):
-        if index_1 < 0:
-            if res[i + 1] > res[i] and res[i] < 0 and res[i + 1] > 0:
-                if abs(res[i]) < abs(res[i + 1]):
-                    index_1 = i
-                else:
-                    index_1 = i + 1
-        else:
-            if res[i + 1] < res[i] and res[i] > 0 and res[i + 1] < 0:
-                if abs(res[i]) < abs(res[i + 1]):
-                    index_2 = i
-                else:
-                    index_2 = i + 1
-                break
-
+        for i in range(count, len(res) - 1):
+            if index_1 < 0:
+                if res[i + 1] > res[i] and res[i] < 0 and res[i + 1] > 0:
+                    if abs(res[i]) < abs(res[i + 1]):
+                        index_1 = i
+                    else:
+                        index_1 = i + 1
+            else:
+                if res[i + 1] < res[i] and res[i] > 0 and res[i + 1] < 0:
+                    if abs(res[i]) < abs(res[i + 1]):
+                        index_2 = i
+                    else:
+                        index_2 = i + 1
+                    break
+    except Exception as e:
+        print(e)
     output['data1'] = round(max(res[index_1:index_2]), 4)
     output['data2'] = (index_2 - index_1) * 0.01
     output['data3'] = output['data1'] * output['data2']
@@ -76,27 +86,30 @@ for index in range(len(file)):
     file.loc[index, ('MATLAB计算结果', '最后大半波时间/ms')] = dic['data2']
     file.loc[index, ('MATLAB计算结果', '短路电流计算值熄弧大半波电流峰值与熄弧大半波电流持续时间乘积/kA*ms')] = dic['data3']
 
-    if file.loc[index, ('型式试验数据', '额定开断电流/kA')] > file.loc[index, ('220kV及以上变电站母线短路电流', '三相接地短路电流（kA）')]:
-        file.loc[index, ('校核结果', '短路开断电流是否满足要求')] = '是'
-    else:
-        file.loc[index, ('校核结果', '短路开断电流是否满足要求')] = '否'
-    if file.loc[index, ('型式试验数据', '额定开断电流/kA')] > file.loc[index, ('短路电流计算数据', '短路电流交流分量有效值Ib/kA')]:
-        file.loc[index, ('校核结果', '交流分量是否超标')] = '否'
-    else:
-        file.loc[index, ('校核结果', '交流分量是否超标')] = '是'
-    if file.loc[index, ('型式试验数据', '额定开断电流/kA')] > file.loc[index, ('短路电流计算数据', '时间常数τdc/ms')]:
-        file.loc[index, ('校核结果', '直流分量是否超标')] = '否'
-    else:
-        file.loc[index, ('校核结果', '直流分量是否超标')] = '是'
-    if file.loc[index, ('型式试验数据', '型式试验熄弧大半波电流峰值与熄弧大半波电流持续时间乘积/kA*ms')] < \
-            file.loc[index, ('MATLAB计算结果', '短路电流计算值熄弧大半波电流峰值与熄弧大半波电流持续时间乘积/kA*ms')]:
-        file.loc[index, ('校核结果', '熄弧大半波峰值电流与持续时间乘积是否满足要求')] = '否'
-    else:
-        file.loc[index, ('校核结果', '熄弧大半波峰值电流与持续时间乘积是否满足要求')] = '是'
-    if file.loc[index, ('型式试验数据', '额定峰值耐受电流/kA')] < file.loc[index, ('MATLAB计算结果', '熄弧大半波电流峰值')]:
-        file.loc[index, ('校核结果', '峰值耐受电流是否满足要求')] = '否'
-    else:
-        file.loc[index, ('校核结果', '峰值耐受电流是否满足要求')] = '是'
+    try:
+        if file.loc[index, ('型式试验数据', '额定开断电流/kA')] > file.loc[index, ('220kV及以上变电站母线短路电流', '三相接地短路电流（kA）')]:
+            file.loc[index, ('校核结果', '短路开断电流是否满足要求')] = '是'
+        else:
+            file.loc[index, ('校核结果', '短路开断电流是否满足要求')] = '否'
+        if file.loc[index, ('型式试验数据', '额定开断电流/kA')] > file.loc[index, ('短路电流计算数据', '短路电流交流分量有效值Ib/kA')]:
+            file.loc[index, ('校核结果', '交流分量是否超标')] = '否'
+        else:
+            file.loc[index, ('校核结果', '交流分量是否超标')] = '是'
+        if file.loc[index, ('型式试验数据', '额定开断电流/kA')] > file.loc[index, ('短路电流计算数据', '时间常数τdc/ms')]:
+            file.loc[index, ('校核结果', '直流分量是否超标')] = '否'
+        else:
+            file.loc[index, ('校核结果', '直流分量是否超标')] = '是'
+        if file.loc[index, ('型式试验数据', '型式试验熄弧大半波电流峰值与熄弧大半波电流持续时间乘积/kA*ms')] < \
+                file.loc[index, ('MATLAB计算结果', '短路电流计算值熄弧大半波电流峰值与熄弧大半波电流持续时间乘积/kA*ms')]:
+            file.loc[index, ('校核结果', '熄弧大半波峰值电流与持续时间乘积是否满足要求')] = '否'
+        else:
+            file.loc[index, ('校核结果', '熄弧大半波峰值电流与持续时间乘积是否满足要求')] = '是'
+        if file.loc[index, ('型式试验数据', '额定峰值耐受电流/kA')] < file.loc[index, ('MATLAB计算结果', '熄弧大半波电流峰值')]:
+            file.loc[index, ('校核结果', '峰值耐受电流是否满足要求')] = '否'
+        else:
+            file.loc[index, ('校核结果', '峰值耐受电流是否满足要求')] = '是'
+    except Exception as e:
+        print(e)
 
 
 file.to_excel('计算结果.xlsx')
