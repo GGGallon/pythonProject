@@ -10,8 +10,8 @@ index = 0
 res = []
 
 titile = re.compile(r'<span class="title">(.*?)</span>')
-actors = re.compile(r'<p class="">(.*?)<br/>',re.S)
-type = re.compile(r'<br/>(.*?)</p>',re.S)
+actors = re.compile(r'<p class="">(.*?)<br/>', re.S)
+type = re.compile(r'<br/>(.*?)</p>', re.S)
 comment = re.compile(r'<span class="inq">(.*?)</span>')
 # t = re.compile(r'<p class="">(.*?)</p>', re.S)
 
